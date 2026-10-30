@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA Crossover — Terminal</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-ws-port="{{WS_PORT}}">
+    <div class="container">
+        <div class="signals-panel" id="signalsPanel"></div>
+        <div class="header">
+            <div>
+                <h1>📊 MA Crossover — Terminal</h1>
+                <div class="subtitle">
+                    <span class="stream-indicator disconnected" id="streamIndicator"></span>
+                    🔍 {{TICKER_NAME}} ({{SYMBOL}}) | T-Invest API | Realtime Streaming
+                    <div class="current-price-display" id="currentPriceDisplay">💰 Текущая цена: загрузка...</div>
+                </div>
+                <div class="params">
+                    Fast EMA {{FAST_EMA_PERIOD}} · Slow EMA {{SLOW_EMA_PERIOD}} ·
+                    ATR {{ATR_PERIOD}} · TP = {{TP_ATR_MULT}}×ATR · RSI filter · ATR stop
+                </div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="input-group">
+                <label>📈 Тикер</label>
+                <select id="symbolSelect" onchange="handleSymbolChange()">
+                    {{TICKER_OPTIONS}}
+                </select>
+            </div>
+            <div class="input-group" id="customSymbolGroup" style="display:none;">
+                <label>✏️ Свой тикер</label>
+                <input type="text" id="customSymbol" placeholder="Например SBER" style="text-transform:uppercase">
+            </div>
+            <div class="input-group">
+                <label>⏱ Таймфрейм</label>
+                <select id="timeframe" onchange="handleTimeframeChange()">
+                    <option value="1m">1 минута</option>
+                    <option value="10m" selected>10 минут</option>
+                    <option value="1h">1 час</option>
+                    <option value="1d">1 день</option>
+                    <option value="1w">1 неделя</option>
+                    <option value="1M">1 месяц</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>🎯 Режим</label>
+                <select id="mode" onchange="handleModeChange()">
+                    <option value="signals" selected>Все сигналы</option>
+                    <option value="trading">Торговля (без повторных)</option>
+                </select>
+            </div>
+            <button class="btn btn-update" onclick="updateChart()">🔄 ОБНОВИТЬ</button>
+            <button class="btn btn-auto" id="autoBtn" onclick="toggleAutoRefresh()">▶ АВТО</button>
+            <button class="btn btn-stream" id="streamBtn" onclick="toggleStreaming()">📡 СТРИМ</button>
+            <button class="btn btn-reset" onclick="resetZoom()">🔍 СБРОС</button>
+        </div>
+        <div class="stats">
+            <div class="stat-card"><div class="value" id="statSignals">-</div><div class="label">Сигналов</div></div>
+            <div class="stat-card buy"><div class="value" id="statBuys">-</div><div class="label">🔺 Покупок</div></div>
+            <div class="stat-card sell"><div class="value" id="statSells">-</div><div class="label">🔻 Продаж</div></div>
+            <div class="stat-card"><div class="value" id="statCandles">-</div><div class="label">Свечей</div></div>
+            <div class="stat-card"><div class="value" id="statPrice">-</div><div class="label">Цена</div></div>
+            <div class="stat-card"><div class="value" id="statCache">-</div><div class="label">Кэш</div></div>
+            <div class="stat-card"><div class="value" id="statStream">-</div><div class="label">Стрим</div></div>
+        </div>
+        <div class="stats" id="tradingStats" style="display:none;">
+            <div class="stat-card"><div class="value" id="statTrades">-</div><div class="label">Сделок</div></div>
+            <div class="stat-card buy"><div class="value" id="statWins">-</div><div class="label">✅ Прибыльных</div></div>
+            <div class="stat-card sell"><div class="value" id="statLosses">-</div><div class="label">❌ Убыточных</div></div>
+            <div class="stat-card"><div class="value" id="statWinRate">-</div><div class="label">Win rate</div></div>
+            <div class="stat-card" id="cardTotalPnl"><div class="value" id="statTotalPnl">-</div><div class="label">PNL %</div></div>
+            <div class="stat-card" id="cardAvgPnl"><div class="value" id="statAvgPnl">-</div><div class="label">Средний PNL</div></div>
+        </div>
+        <div id="chart-container">
+            <div id="chart"></div>
+            <div class="loading" id="loading">⏳ Загрузка данных...</div>
+        </div>
+        <div class="status-bar">
+            <div style="flex: 1;">
+                Статус: <span id="statusText"><span style="color:#da3633;">●</span> Ожидание</span>
+                <span style="font-size:11px;color:#484f58;margin-left:10px;" id="lastUpdate"></span>
+            </div>
+            <div style="flex: 1; max-width: 400px;">
+                <div class="last-signals-table">
+                    <strong style="color: #58a6ff; font-size: 13px;">📊 ПОСЛЕДНИЕ СИГНАЛЫ:</strong>
+                    <div id="lastSignalsList" style="margin-top: 5px; font-size: 12px; color: #8b949e;">Загрузка...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="error-toast" id="errorToast"></div>
+    <script src="/static/app.js" defer></script>
+</body>
+</html>

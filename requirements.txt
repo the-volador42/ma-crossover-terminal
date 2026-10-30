@@ -1,0 +1,6 @@
+numpy>=1.26
+pandas>=2.1
+pytz>=2024.1
+websockets>=12.0,<17
+python-dotenv>=1.0
+t-tech-investments @ https://github.com/Invest-SDK/invest-python/raw/refs/heads/master/t_tech_investments-1.51.0-py3-none-any.whl
